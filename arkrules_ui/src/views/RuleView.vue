@@ -8,7 +8,7 @@ export default {
 }
 </script>
 
-<template>npm
+<template>
   <div>
     <RuleList />
   </div>

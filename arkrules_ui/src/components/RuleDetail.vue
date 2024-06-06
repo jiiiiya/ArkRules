@@ -17,7 +17,6 @@ export default {
   },
   created() {
     this.id = history.state.id
-    console.log(history.state)
     this.fetchRule()
   }
 }
@@ -35,8 +34,19 @@ export default {
     <div>
       <strong>Condition:</strong> {{ rule.conditions }}
     </div>
-    <div>
-      <strong>Action:</strong> {{ rule.action }}
-    </div>
   </div>
 </template>
+
+<style scoped>
+div {
+  margin-bottom: 15px;
+}
+
+textarea {
+  margin-bottom: 10px;
+}
+
+button {
+  margin-top: 10px;
+}
+</style>

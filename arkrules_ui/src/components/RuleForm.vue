@@ -5,9 +5,9 @@ export default {
   data() {
     return {
       rule: {
-        name: '',
-        description: '',
-        conditions: ''
+        ruleType: '',
+        ruleCode: '',
+        ruleConditions: ''
       },
       isEdit: false,
       errorMessage: '',
@@ -24,6 +24,8 @@ export default {
       if (this.isEdit) {
         axios.put(`/api/rules/${this.id}`, this.rule).then(() => {
           this.$router.push('/rules')
+        }).catch(error => {
+          this.errorMessage = error.response.data
         })
       } else {
         axios.post('/api/rules', this.rule).then(() => {
@@ -32,7 +34,7 @@ export default {
           this.errorMessage = error.response.data
         })
       }
-    }
+    },
   },
   created() {
     this.id = history.state.id
@@ -46,22 +48,51 @@ export default {
 
 <template>
   <div>
-    <h1>{{ isEdit ? 'Edit Rule' : 'Create Rule' }}</h1>
+    <h1>{{ isEdit ? 'Edit Rule' : 'Add Rule' }}</h1>
     <form @submit.prevent="submitForm">
       <div>
-        <label>Name</label>
-        <input v-model="rule.name" />
+        <label>Type</label>
+        <select v-model="rule.ruleType">
+          <option value="C">Classify</option>
+          <option value="V">Validate</option>
+          <option value="T">Convert</option>
+        </select>
       </div>
       <div>
-        <label>Description</label>
-        <input v-model="rule.description" />
+        <label>Code (find target)</label>
+        <input v-model="rule.ruleCode" />
       </div>
       <div>
-        <label>Condition (JSON)</label>
-        <textarea v-model="rule.conditions"></textarea>
+        <label>Conditions {{ rule.ruleType === 'C' ? '' : ' (JSON)' }}</label>
+        <textarea class="classify" v-model="rule.ruleConditions" required></textarea>
       </div>
-      <button type="submit">Submit</button>
+      <button type="submit">Save</button>
     </form>
     <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
   </div>
 </template>
+
+<style scoped>
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+form div {
+  margin-bottom: 15px;
+}
+
+label {
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+button {
+  align-self: flex-start;
+}
+
+select {
+  width: 200px;
+}
+
+</style>

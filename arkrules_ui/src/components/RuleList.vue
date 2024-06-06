@@ -11,7 +11,6 @@ export default {
     fetchRules() {
       axios.get('/api/rules').then(response => {
         this.rules = response.data
-        console.log(response.data)
       })
     },
     editRule(id) {
@@ -26,6 +25,14 @@ export default {
       axios.delete(`/api/rules/${id}`).then(() => {
         this.fetchRules()
       })
+    },
+    historyRule(id) {
+      this.$router.push({
+        path: `/changes/${id}`,
+        state: {
+          id: id
+        }
+      })
     }
   },
   created() {
@@ -39,11 +46,45 @@ export default {
     <h1>Rule List</h1>
     <ul>
       <li v-for="rule in rules" :key="rule.id">
-        <router-link :to="'/rules/' + rule.id" :state="{id: rule.id}">{{ rule.name }}</router-link>
+        <p>Type: {{ rule.ruleType === "C" ? "Classify" : rule.ruleType === "V" ? "Validate" : "Convert" }}</p>
+        <p>Code: {{ rule.ruleCode }}</p>
         <button @click="editRule(rule.id)">Edit</button>
         <button @click="deleteRule(rule.id)">Delete</button>
+        <button @click="historyRule(rule.id)">History</button>
       </li>
     </ul>
-    <router-link to="/rules/new">Add New Rule</router-link>
+    <div>
+      <ul>
+        <li>
+          <router-link to="/rules/new">Add Rule</router-link>
+        </li>
+        <li>
+          <router-link to="/rules/test">Test Rule</router-link>
+        </li>
+      </ul>
+    </div>
   </div>
 </template>
+
+<style scoped>
+ul {
+  padding: 0;
+}
+
+li {
+  margin-bottom: 20px;
+  padding: 10px;
+  background: #f9f9f9;
+  border-radius: 4px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+p {
+  margin: 5px 0;
+}
+
+button {
+  margin-right: 10px;
+}
+
+</style>

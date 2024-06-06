@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/rules/change")
+@RequestMapping("/api/changes")
 public class RuleChangeController {
 
     @Autowired

@@ -24,7 +24,15 @@ const router = createRouter({
         {
             path: '/rules/:id',
             component: () => import('../components/RuleDetail.vue')
-        }
+        },
+        {
+            path: '/changes/:id',
+            component: () => import('../components/RuleChangeList.vue')
+        },
+        {
+            path: '/rules/test',
+            component: () => import('../components/RuleTest.vue')
+        },
     ]
 })
 

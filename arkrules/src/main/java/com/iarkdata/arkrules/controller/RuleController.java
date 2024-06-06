@@ -38,4 +38,9 @@ public class RuleController {
     public void deleteRule(@PathVariable int id) {
         ruleService.deleteRule(id);
     }
+
+    @PostMapping("/test")
+    public String simulateRule(@RequestBody String testData) throws Exception {
+        return ruleService.simulateRule(testData);
+    }
 }
