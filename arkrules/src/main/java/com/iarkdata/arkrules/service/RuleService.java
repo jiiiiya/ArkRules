@@ -28,7 +28,7 @@ public class RuleService {
     }
 
     public Rule getRuleById(int id) {
-        return ruleRepository.findById(id).orElseThrow(() -> new RuntimeException("Rule not found"));
+        return ruleRepository.findById(id).orElseThrow(() -> new RuntimeException("Rule not found."));
     }
 
     public Rule createRule(Rule rule) throws Exception {
@@ -52,7 +52,7 @@ public class RuleService {
                     rule.setRuleConditions(ruleDetails.getRuleConditions());
                     return ruleRepository.save(rule);
                 })
-                .orElseThrow(() -> new RuntimeException("Rule not found"));
+                .orElseThrow(() -> new RuntimeException("Rule not found."));
     }
 
     public void deleteRule(int id) {
@@ -66,40 +66,45 @@ public class RuleService {
     }
 
     public String simulateRule(String testData) throws Exception {
-        String result;
+        String result = "";
 
         // input data parsing
         RuleTest input = parseTest(testData);
-
         // classify rule 등록
         Map<Integer, String> classifyRules = new HashMap<>();
-        List<Rule> rulesC = ruleRepository.findByRuleType("C");
-        List<Rule> rulesV = ruleRepository.findByRuleType("V");
-        List<Rule> rulesT = ruleRepository.findByRuleType("T");
-
+        List<Rule> rulesC = getRuleByType("C");
+        List<Rule> rulesV = getRuleByType("V");
+        List<Rule> rulesT = getRuleByType("T");
+        // target 지정
         if(!input.getCode().isEmpty()) {
             rulesC = rulesC.stream().filter(rule -> rule.getRuleCode().equals(input.getCode())).toList();
         }
-
+        
         rulesC.forEach(rule -> classifyRules.put(rule.getId(), rule.getRuleConditions()));
-
         ClassifyResult cr = classify(classifyRules, input.getInput());
         if (!cr.getIds().isEmpty()) {
-            // 찾은 classify code 와 일치하는 code를 가진 validate 룰 찾기
-            Rule matchRule = ruleRepository.findById(cr.getIds().get(0)).orElseThrow(() -> new RuntimeException("Rule not found"));
-            Rule matchValidate = rulesV.stream().filter(rule -> rule.getRuleCode().equals(matchRule.getRuleCode())).findAny().orElseThrow(() -> new RuntimeException("Rule not found"));
-            ValidateResult vr = validate(matchValidate, input.getInput());
-            if(vr.isSuccess()){
-                // 찾은 validate code 와 일치하는 code를 가진 convert 룰 찾기
-                Rule matchConvert = rulesT.stream().filter(rule -> rule.getRuleCode().equals(matchValidate.getRuleCode())).findAny().orElseThrow(() -> new RuntimeException("Rule not found"));
-                ConvertResult cvr = convert(matchConvert, input.getInput());
-                if(cvr.isSuccess()) {
-                    result = cvr.getJson();
-                } else {
-                    throw new Exception("Invalid convert.\n" + cvr.getFailReason());
+            for(Integer key : cr.getIds()) {
+                try {
+                    // 찾은 classify code 와 일치하는 code를 가진 validate 룰 찾기
+                    String matchRule = getRuleById(key).getRuleCode();
+                    Rule matchValidate = rulesV.stream().filter(rule -> rule.getRuleCode().equals(matchRule)).findAny().orElseThrow(() -> new RuntimeException("Validate-Rule not found."));
+                    ValidateResult vr = validate(matchValidate, input.getInput());
+                    if (vr.isSuccess()) {
+                        // 찾은 validate code 와 일치하는 code를 가진 convert 룰 찾기
+                        Rule matchConvert = rulesT.stream().filter(rule -> rule.getRuleCode().equals(matchValidate.getRuleCode())).findAny().orElseThrow(() -> new RuntimeException("Convert-Rule not found."));
+                        ConvertResult cvr = convert(matchConvert, input.getInput());
+                        if (cvr.isSuccess()) {
+                            result = cvr.getJson();
+                            break;
+                        } else {
+                            throw new Exception("Invalid convert.\n" + cvr.getFailReason());
+                        }
+                    } else {
+                        throw new Exception("Invalid convert.\n" + vr.getFailReason());
+                    }
+                } catch(Exception ex) {
+                    result = ex.getMessage();
                 }
-            } else {
-                throw new Exception("Invalid convert.\n" + vr.getFailReason());
             }
         } else {
             throw new Exception("No matching classification.\n" + cr.getFailReason());
@@ -210,5 +215,9 @@ public class RuleService {
         } else {
             throw new Exception("Invalid convert.\n" + jc.getFailReason());
         }
+    }
+
+    private List<Rule> getRuleByType(String type) {
+        return ruleRepository.findByRuleType(type);
     }
 }
