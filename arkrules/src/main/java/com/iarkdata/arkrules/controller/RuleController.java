@@ -43,4 +43,9 @@ public class RuleController {
     public String simulateRule(@RequestBody String testData) throws Exception {
         return ruleService.simulateRule(testData);
     }
+
+    @PostMapping("/test/{id}")
+    public String simulateRule(@PathVariable int id, @RequestBody String testData) throws Exception {
+        return ruleService.simulateRuleById(id, testData);
+    }
 }

@@ -66,11 +66,10 @@ public class RuleService {
     }
 
     public String simulateRule(String testData) throws Exception {
-        String result = "";
+        String result;
 
-        // test 로직 구현
         // input data parsing
-        String input = parseTest(testData);
+        RuleTest input = parseTest(testData);
 
         // classify rule 등록
         Map<Integer, String> classifyRules = new HashMap<>();
@@ -78,42 +77,69 @@ public class RuleService {
         List<Rule> rulesV = ruleRepository.findByRuleType("V");
         List<Rule> rulesT = ruleRepository.findByRuleType("T");
 
+        if(!input.getCode().isEmpty()) {
+            rulesC = rulesC.stream().filter(rule -> rule.getRuleCode().equals(input.getCode())).toList();
+        }
+
         rulesC.forEach(rule -> classifyRules.put(rule.getId(), rule.getRuleConditions()));
 
-        JsonClassifier jc = JsonClassifier.apply(classifyRules, false);
-        if (jc.isSuccess()) {
-            ClassifyResult cr = jc.search(input);
-            if(cr.isSuccess()) {
-                // classify 일치 룰 찾기
-                Rule matchRule = ruleRepository.findById(cr.getIds().get(0)).orElseThrow(() -> new RuntimeException("Rule not found"));
-                Rule matchValidate = rulesV.stream().filter(rule -> rule.getRuleCode().equals(matchRule.getRuleCode())).findAny().orElseThrow(() -> new RuntimeException("Rule not found"));
-                JsonValidator jv = JsonValidator.apply(matchValidate.getRuleConditions());
-                if(jv.isSuccess()) {
-                    ValidateResult vr = jv.validate(input);
-                    if(vr.isSuccess()) {
-                        Rule matchConvert = rulesT.stream().filter(rule -> rule.getRuleCode().equals(matchValidate.getRuleCode())).findAny().orElseThrow(() -> new RuntimeException("Rule not found"));
-                        JsonConverter jcv = JsonConverter.apply(matchConvert.getRuleConditions());
-                        if(jcv.isSuccess()) {
-                            ConvertResult cvr = jcv.convert(input);
-                            if(cvr.isSuccess()) {
-                                result = cvr.getJson();
-                            } else {
-                                throw new Exception("Invalid convert.\n" + cvr.getFailReason());
-                            }
-                        } else {
-                            throw new Exception("Invalid convert.\n" + jcv.getFailReason());
-                        }
-                    } else {
-                        throw new Exception("Invalid validation.\n" + vr.getFailReason());
-                    }
+        ClassifyResult cr = classify(classifyRules, input.getInput());
+        if (!cr.getIds().isEmpty()) {
+            // 찾은 classify code 와 일치하는 code를 가진 validate 룰 찾기
+            Rule matchRule = ruleRepository.findById(cr.getIds().get(0)).orElseThrow(() -> new RuntimeException("Rule not found"));
+            Rule matchValidate = rulesV.stream().filter(rule -> rule.getRuleCode().equals(matchRule.getRuleCode())).findAny().orElseThrow(() -> new RuntimeException("Rule not found"));
+            ValidateResult vr = validate(matchValidate, input.getInput());
+            if(vr.isSuccess()){
+                // 찾은 validate code 와 일치하는 code를 가진 convert 룰 찾기
+                Rule matchConvert = rulesT.stream().filter(rule -> rule.getRuleCode().equals(matchValidate.getRuleCode())).findAny().orElseThrow(() -> new RuntimeException("Rule not found"));
+                ConvertResult cvr = convert(matchConvert, input.getInput());
+                if(cvr.isSuccess()) {
+                    result = cvr.getJson();
                 } else {
-                    throw new Exception("Invalid validation.\n" + jv.getFailReason());
+                    throw new Exception("Invalid convert.\n" + cvr.getFailReason());
                 }
             } else {
-                throw new Exception("No matching classification.\n" + cr.getFailReason());
+                throw new Exception("Invalid convert.\n" + vr.getFailReason());
             }
         } else {
-            throw new Exception("Invalid Classification.\n" + jc.getFailReason());
+            throw new Exception("No matching classification.\n" + cr.getFailReason());
+        }
+
+        return result;
+    }
+
+    public String simulateRuleById(int id, String testData) throws Exception {
+        String result;
+
+        // input data parsing
+        RuleTest input = parseTest(testData);
+
+        // rule check
+        Rule rule = ruleRepository.findById(id).orElseThrow(() -> new RuntimeException("Rule not found"));
+        Map<Integer, String> classifyRules = new HashMap<>();
+        classifyRules.put(rule.getId(), rule.getRuleConditions());
+
+        if(rule.getRuleType().equals("C")) {
+            ClassifyResult cr = classify(classifyRules, input.getInput());
+            if(!cr.getIds().isEmpty()) {
+                result = cr.show();
+            } else {
+                throw new Exception("No matching classification.\n" + cr.show());
+            }
+        } else if(rule.getRuleType().equals("V")) {
+            ValidateResult vr = validate(rule, input.getInput());
+            if(vr.isSuccess()) {
+                result = vr.getJson();
+            } else  {
+                throw new Exception("Invalid validate.\n" + vr.getFailReason());
+            }
+        } else {
+            ConvertResult cr = convert(rule, input.getInput());
+            if(cr.isSuccess()) {
+                result = cr.getJson();
+            } else {
+                throw new Exception("Invalid convert.\n" + cr.getFailReason());
+            }
         }
 
         return result;
@@ -136,17 +162,53 @@ public class RuleService {
                 throw new InvalidJsonException("Invalid JSON format: " + json);
             }
         } catch (Exception e) {
-            throw new InvalidJsonException("Invalid JSON format: " + json);
+            throw new Exception("Invalid JSON format: " + json);
         }
     }
 
-    private String parseTest(String json) throws Exception {
+    private RuleTest parseTest(String json) throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
-            RuleTest parseString = objectMapper.readValue(json, RuleTest.class);
-            return parseString.getInput();
+            return objectMapper.readValue(json, RuleTest.class);
         } catch (Exception e) {
-            throw new InvalidJsonException("Invalid JSON format: " + json);
+            throw new Exception("Invalid JSON format: " + json);
+        }
+    }
+
+    private ClassifyResult classify(Map<Integer, String> classifyRules, String inputData) throws Exception {
+        ClassifyResult result;
+        JsonClassifier jc = JsonClassifier.apply(classifyRules, true);
+        if (jc.isSuccess()) {
+            result = jc.search(inputData);
+            if(result.isSuccess()) {
+                return result;
+            } else {
+                throw new Exception("No matching classification.\n" + result.getFailReason());
+            }
+        } else {
+            throw new Exception("Invalid Classification.\n" + jc.getFailReason());
+        }
+    }
+
+    private ValidateResult validate(Rule rule, String inputData) throws Exception {
+        ValidateResult result;
+        JsonValidator jv = JsonValidator.apply(rule.getRuleConditions());
+        if (jv.isSuccess()) {
+            result = jv.validate(inputData);
+            return result;
+        } else {
+            throw new Exception("Invalid validation.\n" + jv.getFailReason());
+        }
+    }
+
+    private ConvertResult convert(Rule rule, String inputData) throws Exception {
+        ConvertResult result;
+        JsonConverter jc = JsonConverter.apply(rule.getRuleConditions());
+        if (jc.isSuccess()) {
+            result = jc.convert(inputData);
+            return result;
+        } else {
+            throw new Exception("Invalid convert.\n" + jc.getFailReason());
         }
     }
 }

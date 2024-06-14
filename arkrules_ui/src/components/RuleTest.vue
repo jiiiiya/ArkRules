@@ -5,9 +5,11 @@ export default {
   data() {
     return {
       simulator: {
+        code: '',
         input: '',
         result: ''
       },
+      rules: []
     }
   },
   methods: {
@@ -17,21 +19,33 @@ export default {
       }).catch(error => {
         this.simulator.result = error.response.data
       })
-    }
+    },
+    fetchRules() {
+      axios.get('/api/rules').then(response => {
+        this.rules = new Set(response.data.filter(rule => rule.ruleType === 'C'))
+      })
+    },
   },
   created() {
+    this.fetchRules()
   }
 }
 </script>
 
 <template>
   <div>
-    <h1>Rule Test...</h1>
+    <h1>Rule Test</h1>
     <form @submit.prevent="testRule">
       <button class="simulator_button">Run</button>
+      <select v-model="simulator.code">
+        <option value="">--- Code (find target) ---</option>
+        <option v-for="rule in rules" :key="rule.id" :value="rule.ruleCode">
+          {{ rule.ruleCode }}
+        </option>
+      </select>
       <div>
         <div class="simulator">
-          <textarea v-model="simulator.input" required></textarea>
+          <textarea v-model="simulator.input"></textarea>
         </div>
         <div class="simulator">
           <textarea v-model="simulator.result"></textarea>
@@ -43,20 +57,6 @@ export default {
 
 <style scoped>
 
-form {
-  display: flex;
-  flex-direction: column;
-}
-
-form div {
-  margin-bottom: 15px;
-}
-
-label {
-  margin-bottom: 5px;
-  font-weight: bold;
-}
-
 button {
   align-self: flex-start;
 }
@@ -66,8 +66,15 @@ div.simulator {
   float: left;
 }
 
+input, select {
+  width: 30%;
+  float: left;
+}
+
 button.simulator_button {
   align-self: flex-start;
   margin-left: 10px;
 }
+
+
 </style>

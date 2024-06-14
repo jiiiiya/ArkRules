@@ -33,7 +33,16 @@ export default {
           id: id
         }
       })
-    }
+    },
+    testRule(id) {
+      this.$router.push({
+        path: `/rules/${id}/edit`,
+        state: {
+          id: id,
+          isTest: true
+        }
+      })
+    },
   },
   created() {
     this.fetchRules()
@@ -44,15 +53,6 @@ export default {
 <template>
   <div>
     <h1>Rule List</h1>
-    <ul>
-      <li v-for="rule in rules" :key="rule.id">
-        <p>Type: {{ rule.ruleType === "C" ? "Classify" : rule.ruleType === "V" ? "Validate" : "Convert" }}</p>
-        <p>Code: {{ rule.ruleCode }}</p>
-        <button @click="editRule(rule.id)">Edit</button>
-        <button @click="deleteRule(rule.id)">Delete</button>
-        <button @click="historyRule(rule.id)">History</button>
-      </li>
-    </ul>
     <div>
       <ul>
         <li>
@@ -63,10 +63,55 @@ export default {
         </li>
       </ul>
     </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Id</th>
+          <th>Type</th>
+          <th>Code</th>
+          <th>Rules</th>
+          <th>Edit</th>
+          <th>Delete</th>
+          <th>History</th>
+          <th>Test</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="rule in rules" :key="rule.id">
+          <td>{{ rule.id }}</td>
+          <td>{{ rule.ruleType === "C" ? "Classify" : rule.ruleType === "V" ? "Validate" : "Convert" }}</td>
+          <td>{{ rule.ruleCode }}</td>
+          <td style="word-break:break-all">
+            {{ rule.ruleConditions }}
+          </td>
+          <td><button @click="editRule(rule.id)">Edit</button></td>
+          <td><button @click="deleteRule(rule.id)">Delete</button></td>
+          <td><button @click="historyRule(rule.id)">History</button></td>
+          <td><button @click="testRule(rule.id)">Test</button></td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </template>
 
 <style scoped>
+
+table {
+  text-align: center;
+}
+table th {
+  font-weight: bold;
+  color: #0f1f32;
+  padding: 8px;
+  border-bottom: 1px solid #C8CBCF;
+}
+
+table td {
+  padding: 5px;
+  text-align: left;
+  border-bottom: 1px solid #DFE2E7;
+}
+
 ul {
   padding: 0;
 }

@@ -6,6 +6,15 @@ body {
     color: #333;
 }
 
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+form div {
+    margin-bottom: 15px;
+}
+
 h1, h2 {
     color: #444;
 }
@@ -24,17 +33,17 @@ textarea {
 }
 
 button {
-    background-color: #007bff;
+    background-color: #38465B;
     color: white;
     border: none;
-    padding: 8px 20px;
+    padding: 7px 20px;
     margin: 10px auto;
     border-radius: 4px;
     cursor: pointer;
 }
 
 button:hover {
-    background-color: #0056b3;
+    background-color: #637188;
 }
 
 input, textarea, select {
