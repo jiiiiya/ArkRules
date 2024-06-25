@@ -1,0 +1,42 @@
+[
+  {
+    "prescription": {
+      "id": "a7d2f523-064c-4cc0-8303-bf1f62bfd756",
+      "insureKindCd": "",
+      "insureKindNm": "",
+      "hospitalCd": "34100199",
+      "prescriptionDt": "20230904",
+      "prescriptionNo": "10773",
+      "patientNm": "홍승영",
+      "identificationNo": "6911062471812",
+      "hospitalNm": "단국대학교병원",
+      "hospitalTel": "041-550-7114",
+      "hospitalFax": "041-556-7056",
+      "doctorNm": "김도희",
+      "doctorLicenseClsNm": "의사",
+      "doctorLicenseNo": "64396",
+      "primaryDiagnosisCd": "C73",
+      "secondaryDiagnosisCd": ""
+    },
+    "drugs": [
+      {
+        "id": "a7d2f523-064c-4cc0-8303-bf1f62bfd756",
+        "seq": 1,
+        "drugNm": "리보트릴정 0.5mg(향정)",
+        "kdCode": "643308800",
+        "doseQtyPer1Tim": "1 tab",
+        "doseQtyPer1Day": 1,
+        "doseDay": 40
+      },
+      {
+        "id": "a7d2f523-064c-4cc0-8303-bf1f62bfd756",
+        "seq": 2,
+        "drugNm": "삼진 디아제팜 2mg(향정)",
+        "kdCode": "647800740",
+        "doseQtyPer1Tim": "1 tab",
+        "doseQtyPer1Day": 1,
+        "doseDay": 40
+      }
+    ]
+  }
+]

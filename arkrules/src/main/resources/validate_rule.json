@@ -1,0 +1,34 @@
+[
+  {
+    "prescription": {
+      "id": "_length(36) && _isString",
+      "insureKindCd": "_any",
+      "insureKindNm": "_any",
+      "hospitalCd": "_digit && _length(8)",
+      "prescriptionDt": "_digit && _length(8)",
+      "prescriptionNo": "_any",
+      "patientNm": "_any",
+      "identificationNo": "_any",
+      "hospitalNm": "_any",
+      "hospitalTel": "_digitOr(-)",
+      "hospitalFax": "_digitOr(-)",
+      "doctorNm": "_any",
+      "doctorLicenseClsNm": "_any",
+      "doctorLicenseNo": "_any",
+      "primaryDiagnosisCd": "_any",
+      "secondaryDiagnosisCd": "_any"
+    },
+    "drugs": [
+      {
+        "id": "_length(36) && _isString",
+        "seq": "gt(0)",
+        "drugNm": "_any",
+        "kdCode": "_any",
+        "doseQtyPer1Tim": "_any",
+        "doseQtyPer1Day": "gt(0)",
+        "doseDay": "gt(0)",
+        "$$$$": "${doseQtyPer1Day} <= ${doseDay}"
+      }
+    ]
+  }
+]

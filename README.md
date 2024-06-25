@@ -2,6 +2,7 @@
 
 ### How-to
 #### 1. create table
+
 ```
 CREATE TABLE tb_rules (
   id INT AUTO_INCREMENT PRIMARY KEY,

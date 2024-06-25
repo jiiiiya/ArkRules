@@ -1,0 +1,45 @@
+{
+  "[$$]": "$[?(.prescription && .drugs)]",
+  "[$>]": {
+    "patient": {
+      "{::}": "$.prescription",
+      "{=>}": {
+        "id": "@.id",
+        "name": "@.patientNm"
+      }
+    },
+    "prescription": {
+      "{::}": "$.prescription",
+      "{=>}": {
+        "id": "@.id",
+        "insureKindCd": "@.insureKindCd",
+        "insureKindNm": "@.insureKindNm",
+        "hospitalCd": "@.hospitalCd",
+        "prescriptionDt": "@.prescriptionDt",
+        "prescriptionNo": "@.prescriptionNo",
+        "patientNm": "@.patientNm",
+        "identificationNo": "@.identificationNo",
+        "hospitalNm": "@.hospitalNm",
+        "hospitalTel": "@.hospitalTel",
+        "hospitalFax": "@.hospitalFax",
+        "doctorNm": "@.doctorNm",
+        "doctorLicenseClsNm": "@.doctorLicenseClsNm",
+        "doctorLicenseNo": "@.doctorLicenseNo",
+        "primaryDiagnosisCd": "@.primaryDiagnosisCd",
+        "secondaryDiagnosisCd": "@.secondaryDiagnosisCd"
+      }
+    },
+    "drugs": {
+      "[::]": "$.drugs[0:]",
+      "[=>]": {
+        "id": "@.id",
+        "seq": "@.seq",
+        "drugNm": "@.drugNm",
+        "kdCode": "@.kdCode",
+        "doseQtyPer1Tim": "@.doseQtyPer1Tim",
+        "doseQtyPer1Day": "@.doseQtyPer1Day",
+        "doseDay": "@.doseDay"
+      }
+    }
+  }
+}
