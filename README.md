@@ -116,3 +116,106 @@ CREATE TABLE tb_rule_changes (
   }
 }
 ```
+
+<details>
+    <summary>input</summary>
+
+```json
+[
+  {
+    "prescription": {
+      "id": "a7d2f523-064c-4cc0-8303-bf1f62bfd756",
+      "insureKindCd": "",
+      "insureKindNm": "",
+      "hospitalCd": "34100199",
+      "prescriptionDt": "20230904",
+      "prescriptionNo": "10773",
+      "patientNm": "홍OO",
+      "identificationNo": "6911062471812",
+      "hospitalNm": "단OOOOO병원",
+      "hospitalTel": "041-550-0000",
+      "hospitalFax": "041-556-0000",
+      "doctorNm": "김OO",
+      "doctorLicenseClsNm": "의사",
+      "doctorLicenseNo": "64396",
+      "primaryDiagnosisCd": "C73",
+      "secondaryDiagnosisCd": ""
+    },
+    "drugs": [
+      {
+        "id": "a7d2f523-064c-4cc0-8303-bf1f62bfd756",
+        "seq": 1,
+        "drugNm": "리보트릴정 0.5mg(향정)",
+        "kdCode": "643308800",
+        "doseQtyPer1Tim": "1 tab",
+        "doseQtyPer1Day": 1,
+        "doseDay": 40
+      },
+      {
+        "id": "a7d2f523-064c-4cc0-8303-bf1f62bfd756",
+        "seq": 2,
+        "drugNm": "삼진 디아제팜 2mg(향정)",
+        "kdCode": "647800740",
+        "doseQtyPer1Tim": "1 tab",
+        "doseQtyPer1Day": 1,
+        "doseDay": 40
+      }
+    ]
+  }
+]
+```
+
+</details>
+
+<details>
+    <summary>output</summary>
+
+```json
+[
+  {
+    "patient": {
+      "id": "a7d2f523-064c-4cc0-8303-bf1f62bfd756",
+      "name": "홍OO"
+    },
+    "prescription": {
+      "id": "a7d2f523-064c-4cc0-8303-bf1f62bfd756",
+      "insureKindCd": "",
+      "insureKindNm": "",
+      "hospitalCd": "34100199",
+      "prescriptionDt": "20230904",
+      "prescriptionNo": "10773",
+      "patientNm": "홍OO",
+      "identificationNo": "6911062471812",
+      "hospitalNm": "단OOOOO병원",
+      "hospitalTel": "041-550-0000",
+      "hospitalFax": "041-556-0000",
+      "doctorNm": "김OO",
+      "doctorLicenseClsNm": "의사",
+      "doctorLicenseNo": "64396",
+      "primaryDiagnosisCd": "C73",
+      "secondaryDiagnosisCd": ""
+    },
+    "drugs": [
+      {
+        "id": "a7d2f523-064c-4cc0-8303-bf1f62bfd756",
+        "seq": 1,
+        "drugNm": "리보트릴정 0.5mg(향정)",
+        "kdCode": "643308800",
+        "doseQtyPer1Tim": "1 tab",
+        "doseQtyPer1Day": 1,
+        "doseDay": 40
+      },
+      {
+        "id": "a7d2f523-064c-4cc0-8303-bf1f62bfd756",
+        "seq": 2,
+        "drugNm": "삼진 디아제팜 2mg(향정)",
+        "kdCode": "647800740",
+        "doseQtyPer1Tim": "1 tab",
+        "doseQtyPer1Day": 1,
+        "doseDay": 40
+      }
+    ]
+  }
+]
+```
+</details>
